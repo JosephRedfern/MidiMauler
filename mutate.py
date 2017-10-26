@@ -1,5 +1,7 @@
+import sys
 import csv
 import random
+
 
 class MidiMauler:
     def __init__(self, csv_filename):
@@ -8,12 +10,12 @@ class MidiMauler:
             self.events = list(reader)
 
     def mutate(self, filename="new.csv", severity=1):
-        new = []
+        new = []  # New list of midi events
 
         likelihood = severity/100
         noise = severity
 
-        #event is a list of midi events
+        # event is a list of midi events
         for event in self.events:
             if event[2].strip() in ("Note_on_c", "Control_c"):
                 if random.random() < likelihood:
@@ -32,9 +34,14 @@ class MidiMauler:
             for event in events:
                 writer.writerow(event)
 
-if __name__ == '__main__':
-    mm = MidiMauler("shortened_ptmd.csv")
 
-    # 50 slides, 49 transitions... 1 outro track?
-    for n in range(50):
-        mm.mutate(filename="output/{}.csv".format(n), severity=n)
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        mm = MidiMauler(sys.argv[1])
+
+        # 50 slides, 49 transitions... 1 outro track?
+        for n in range(50):
+            mm.mutate(filename="output/{}.csv".format(n), severity=n)
+    else:
+        print("usage: python {} <midi.csv>".format(sys.argv[0]))
+        print("(be warned that this will fill output/ with 50 csv files)")
